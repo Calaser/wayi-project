@@ -1,95 +1,67 @@
-import Image from "next/image";
+'use client';
+
+import { useEffect, useState } from "react";
+import axios from "axios";
 import styles from "./page.module.css";
 
 export default function Home() {
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [currentData, setCurrentData] = useState([]);
+
+  async function submitHandler(e) {
+    e.preventDefault();
+
+    let response = await axios.post("https://wayi.league-funny.com/api/task?page=1", { name: name, description: description, isCompleted: false });
+    console.log(response);
+    fetchData();
+  }
+
+  async function fetchData() {
+    try {
+      let dataArray = [];
+      let response = await axios.get("https://wayi.league-funny.com/api/task?page=1");
+      dataArray = response.data.data;
+      let dataCount = response.data.total;
+      for (let i = 1; dataCount > 10 * i; i++) {
+        response = await axios.get(`https://wayi.league-funny.com/api/task?page=${i + 1}`);
+        dataArray = [...dataArray, ...response.data.data]
+      }
+      setCurrentData(dataArray);
+    } catch (error) {
+      console.log("Error fetch:", error);
+    }
+  }
+
+  useEffect(() => {
+    fetchData();
+  }, [])
+
   return (
     <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.js</code>
-        </p>
+      <form className={styles.form} onSubmit={(e) => submitHandler(e)}>
+        <h1>My ToDo List</h1>
         <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+          <label htmlFor="nameInput">任務名稱</label>
+          <input id="nameInput" type="text" value={name} onChange={(e) => setName(e.target.value)}></input>
         </div>
-      </div>
+        <div>
+          <label htmlFor="descriptionInput">任務描述</label>
+          <textarea id="descriptionInput" type="textarea" value={description} rows={5} maxLength={30} onChange={(e) => setDescription(e.target.value)}></textarea>
+        </div>
+        <button type="submit">新增任務</button>
+      </form>
 
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+      <ul className={styles.list}>
+        {currentData.map(task =>
+          <li key={task.id}>
+            <h1>{task.name}</h1>
+            <p>{task.description} {task.isCompleted ? " O " : " X "}</p>
+          </li>
+        )
+        }
+      </ul>
 
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
     </main>
   );
 }
