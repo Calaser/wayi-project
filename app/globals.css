@@ -24,6 +24,11 @@ a {
 button,
 label {
   cursor: pointer;
+  background-color: transparent;
+}
+
+button:active{
+  filter:grayscale(1)
 }
 
 li {
