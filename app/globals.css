@@ -28,7 +28,7 @@ label {
 }
 
 button:active{
-  filter:grayscale(1)
+  transform: scale(0.97);
 }
 
 li {

@@ -115,12 +115,12 @@
   }
 }
 
-.list>.filter{
+.list>.filter {
   padding: 10px;
   flex-basis: 100%;
 }
 
-.list>.filter>button{
+.list>.filter>button {
   font-size: 1.1rem;
   font-weight: bold;
   background-color: rgb(235, 255, 179);

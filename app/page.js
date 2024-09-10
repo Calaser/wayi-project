@@ -9,10 +9,16 @@ export default function Home() {
   const [description, setDescription] = useState("");
   const [currentData, setCurrentData] = useState([]);
   const [isSubmitInvalidData, setIsSubmitInvalidData] = useState(false);
-  const [isHideCompletedTask, setIisHideCompletedTask] = useState(false);
+  const [isHideCompletedTask, setIsHideCompletedTask] = useState(false);
+
+  function keyboardInputHandler(e) {
+    if (e.key === "Enter") {
+      submitHandler(e);
+    }
+  }
 
   function showCompletedTaskHandler() {
-    setIisHideCompletedTask(prev => !prev);
+    setIsHideCompletedTask(prev => !prev);
   }
 
   async function fetchData() {
@@ -46,6 +52,8 @@ export default function Home() {
           isCompleted: false
         });
         fetchData();
+        setName("");
+        setDescription("");
       }
     } catch (error) {
       console.log("Error fetch:", error);
@@ -81,7 +89,7 @@ export default function Home() {
 
   return (
     <main className={styles.main}>
-      <form className={styles.form} onSubmit={(e) => submitHandler(e)}>
+      <form className={styles.form} onSubmit={(e) => submitHandler(e)} onKeyDown={(e) => keyboardInputHandler(e)}>
         <h1>My ToDo List</h1>
         <div className={(isSubmitInvalidData && (name.length > 10 || name.length < 1)) ? styles.invalid : null}>
           <label htmlFor="nameInput">任務名稱</label>
@@ -96,7 +104,7 @@ export default function Home() {
         <span className={styles.warning}>{isSubmitInvalidData ? "資料格式有誤 請修改內容後再送出" : null}</span>
         <button type="submit">新增任務</button>
       </form>
-      
+
       <ul className={styles.list}>
         <div className={styles.filter}>
           <button onClick={() => showCompletedTaskHandler()}>{isHideCompletedTask ? "點擊顯示已完成任務" : "點擊隱藏已完成任務"}</button>
